@@ -41,16 +41,6 @@ Executar apenas os testes web:
 yarn cy:run --spec "cypress/e2e/web/**/*.cy.js"
 ```
 
-## Variáveis de ambiente
-
-O arquivo `cypress.env.json` contém as variáveis usadas pelos testes:
-
-- `apiUrl`: URL base da API
-- `baseUrl`: URL base da aplicação web
-- `token`: token de autenticação usado nos testes de API
-- `emailWeb`: email gerado no teste de cadastro web
-- `passwordWeb`: senha gerada no teste de cadastro web
-
 ## Testes implementados
 
 ### API
