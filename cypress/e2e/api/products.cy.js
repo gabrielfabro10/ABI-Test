@@ -1,28 +1,28 @@
-import { criarUsuario } from "../../support/utils/usuario";
-import { criarUsuarioApi, loginApi, criarProdutoApi } from "../../support/utils/api";
-import { criarProduto } from "../../support/utils/produto";
+import { getFakerUser } from "../../support/utils/users";
+import { createUserApi, loginApi, createProductApi } from "../../support/utils/api";
+import { createProduct } from "../../support/utils/product";
 
-describe("API - Produtos", () => {
+describe("API - Products", () => {
 
-    before(() => {
-        const usuario = criarUsuario();
+    beforeEach(() => {
+        const user = getFakerUser();
 
-        criarUsuarioApi(usuario)
-            .then((responseCadastro) => {
+        return createUserApi(user)
+            .then((registrationResponse) => {
 
-                expect(responseCadastro.status)
+                expect(registrationResponse.status)
                     .to.equal(201);
 
-                loginApi({
-                    email: usuario.email,
-                    password: usuario.password
+                return loginApi({
+                    email: user.email,
+                    password: user.password
                 })
-                    .then((responseLogin) => {
+                    .then((loginResponse) => {
 
-                        expect(responseLogin.status)
+                        expect(loginResponse.status)
                             .to.equal(200);
 
-                        Cypress.env("token", responseLogin.body.authorization);
+                        Cypress.env("token", loginResponse.body.authorization);
 
                     });
 
@@ -30,11 +30,11 @@ describe("API - Produtos", () => {
     });
 
 
-    it("deve cadastrar um produto com sucesso", () => {
+    it("should create a product successfully", () => {
 
-        const produto = criarProduto();
+        const product = createProduct();
 
-        criarProdutoApi(produto)
+        createProductApi(product)
             .then((response) => {
 
                 expect(response.status)
@@ -58,25 +58,25 @@ describe("API - Produtos", () => {
     });
 
 
-    it("não deve permitir cadastrar produto com nome já utilizado", () => {
+    it("should not allow creating a product with a name that is already in use", () => {
 
-        const produto = criarProduto();
+        const product = createProduct();
 
-        criarProdutoApi(produto)
+        createProductApi(product)
             .then((response) => {
 
                 expect(response.status)
                     .to.equal(201);
 
-                criarProdutoApi(produto, {
+                createProductApi(product, {
                     failOnStatusCode: false
                 })
-                    .then((responseDuplicado) => {
+                    .then((duplicateResponse) => {
 
-                        expect(responseDuplicado.status)
+                        expect(duplicateResponse.status)
                             .to.equal(400);
 
-                        expect(responseDuplicado.body.message)
+                        expect(duplicateResponse.body.message)
                             .to.equal("Já existe produto com esse nome");
 
                     });
@@ -86,14 +86,14 @@ describe("API - Produtos", () => {
     });
 
 
-    it("não deve cadastrar produto sem token", () => {
+    it("should not create a product without a token", () => {
 
-        const produto = criarProduto();
+        const product = createProduct();
 
         cy.request({
             method: "POST",
             url: `${Cypress.env("apiUrl")}/produtos`,
-            body: produto,
+            body: product,
             failOnStatusCode: false
         })
             .then((response) => {
@@ -109,14 +109,14 @@ describe("API - Produtos", () => {
     });
 
 
-    it("não deve cadastrar produto com token inválido", () => {
+    it("should not create a product with an invalid token", () => {
 
-        const produto = criarProduto();
+        const product = createProduct();
 
         cy.request({
             method: "POST",
             url: `${Cypress.env("apiUrl")}/produtos`,
-            body: produto,
+            body: product,
             headers: {
                 "Authorization": "tokenInvalido"
             },
@@ -135,44 +135,44 @@ describe("API - Produtos", () => {
     });
 
 
-    it("não deve cadastrar produto sem ser administrador", () => {
+    it("should not create a product without administrator privileges", () => {
 
-        const usuarioComum = criarUsuario();
-        usuarioComum.administrador = "false";
+        const regularUser = getFakerUser();
+        regularUser.administrador = "false";
 
-        criarUsuarioApi(usuarioComum)
-            .then((responseCadastro) => {
+        createUserApi(regularUser)
+            .then((registrationResponse) => {
 
-                expect(responseCadastro.status)
+                expect(registrationResponse.status)
                     .to.equal(201);
 
                 loginApi({
-                    email: usuarioComum.email,
-                    password: usuarioComum.password
+                    email: regularUser.email,
+                    password: regularUser.password
                 })
-                    .then((responseLogin) => {
+                    .then((loginResponse) => {
 
-                        expect(responseLogin.status)
+                        expect(loginResponse.status)
                             .to.equal(200);
 
-                        const produto = criarProduto();
-                        const tokenComum = responseLogin.body.authorization;
+                        const product = createProduct();
+                        const regularToken = loginResponse.body.authorization;
 
                         cy.request({
                             method: "POST",
                             url: `${Cypress.env("apiUrl")}/produtos`,
-                            body: produto,
+                            body: product,
                             headers: {
-                                "Authorization": tokenComum
+                                "Authorization": regularToken
                             },
                             failOnStatusCode: false
                         })
-                            .then((responseProduto) => {
+                            .then((productResponse) => {
 
-                                expect(responseProduto.status)
+                                expect(productResponse.status)
                                     .to.equal(403);
 
-                                expect(responseProduto.body.message)
+                                expect(productResponse.body.message)
                                     .to.equal("Rota exclusiva para administradores");
 
                             });

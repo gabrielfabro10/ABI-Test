@@ -1,13 +1,13 @@
-import { criarUsuario } from "../../support/utils/usuario";
-import { criarUsuarioApi } from "../../support/utils/api";
+import { getFakerUser } from "../../support/utils/users";
+import { createUserApi } from "../../support/utils/api";
 
-describe("API - Usuários", () => {
+describe("API - Users", () => {
 
-    it("deve cadastrar um usuário com sucesso", () => {
+    it("should create a user successfully", () => {
 
-        const usuario = criarUsuario();
+        const user = getFakerUser();
 
-        criarUsuarioApi(usuario)
+        createUserApi(user)
             .then((response) => {
 
                 expect(response.status)
@@ -31,26 +31,26 @@ describe("API - Usuários", () => {
     });
 
 
-    it("não deve permitir cadastrar usuário com email já utilizado", () => {
+    it("should not allow creating a user with an email that is already in use", () => {
 
-        const usuario = criarUsuario();
+        const user = getFakerUser();
 
-        criarUsuarioApi(usuario)
+        createUserApi(user)
             .then((response) => {
 
                 expect(response.status)
                     .to.equal(201);
 
 
-                criarUsuarioApi(usuario, {
+                createUserApi(user, {
                     failOnStatusCode: false
                 })
-                    .then((responseDuplicado) => {
+                    .then((duplicateResponse) => {
 
-                        expect(responseDuplicado.status)
+                        expect(duplicateResponse.status)
                             .to.equal(400);
 
-                        expect(responseDuplicado.body.message)
+                        expect(duplicateResponse.body.message)
                             .to.equal("Este email já está sendo usado");
 
                     });

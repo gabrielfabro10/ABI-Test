@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 
-export function criarUsuario() {
+export function getFakerUser() {
   return {
     nome: faker.person.fullName(),
     email: faker.internet.email(),

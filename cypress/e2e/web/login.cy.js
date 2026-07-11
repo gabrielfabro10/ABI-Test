@@ -1,15 +1,15 @@
 import { faker } from '@faker-js/faker';
-import { preencherCampo, clicarBotao, verificarUrl, verificarTexto } from "../../support/utils/web";
-import { criarUsuarioApi } from "../../support/utils/api";
-import { criarUsuario } from "../../support/utils/usuario";
+import { fillField, clickButton, verifyUrl, verifyText } from "../../support/utils/web";
+import { createUserApi } from "../../support/utils/api";
+import { getFakerUser } from "../../support/utils/users";
 
 describe("Web - Login", () => {
 
-    it("deve realizar login com email e senha válidos", () => {
+    it("should log in with a valid email and password", () => {
 
-        const usuario = criarUsuario();
+        const user = getFakerUser();
 
-        criarUsuarioApi(usuario)
+        createUserApi(user)
             .then((response) => {
 
                 expect(response.status)
@@ -23,29 +23,26 @@ describe("Web - Login", () => {
                     .should("eq", `${Cypress.config("baseUrl")}/login`);
 
 
-                preencherCampo("email", usuario.email);
+                fillField("email", user.email);
 
-                preencherCampo("senha", usuario.password);
-
-
-                clicarBotao("entrar");
+                fillField("senha", user.password);
 
 
-                cy.wait(2000);
+                clickButton("entrar");
 
-
-                verificarUrl(`${Cypress.config("baseUrl")}/admin/home`);
+                cy.location("pathname", { timeout: 10000 })
+                    .should("eq", "/admin/home");
 
             });
 
     });
 
 
-    it("não deve realizar login com senha inválida", () => {
+    it("should not log in with an invalid password", () => {
 
-        const usuario = criarUsuario();
+        const user = getFakerUser();
 
-        criarUsuarioApi(usuario)
+        createUserApi(user)
             .then((response) => {
 
                 expect(response.status)
@@ -55,15 +52,15 @@ describe("Web - Login", () => {
                 cy.visit("/login");
 
 
-                preencherCampo("email", usuario.email);
+                fillField("email", user.email);
 
-                preencherCampo("senha", faker.internet.password());
-
-
-                clicarBotao("entrar");
+                fillField("senha", faker.internet.password());
 
 
-                verificarTexto("Email e/ou senha inválidos");
+                clickButton("entrar");
+
+
+                verifyText("Email e/ou senha inválidos");
 
             });
 

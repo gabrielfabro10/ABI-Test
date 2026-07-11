@@ -1,40 +1,40 @@
-import { criarUsuario } from "../../support/utils/usuario";
-import { criarUsuarioApi, loginApi } from "../../support/utils/api";
+import { getFakerUser } from "../../support/utils/users";
+import { createUserApi, loginApi } from "../../support/utils/api";
 
 
 describe("API - Login", () => {
 
-    it("deve realizar login com usuário válido", () => {
+    it("should log in with a valid user", () => {
 
-        const usuario = criarUsuario();
+        const user = getFakerUser();
 
-        criarUsuarioApi(usuario)
-            .then((responseCadastro) => {
+        createUserApi(user)
+            .then((registrationResponse) => {
 
-                expect(responseCadastro.status)
+                expect(registrationResponse.status)
                     .to.equal(201);
 
 
                 loginApi({
-                    email: usuario.email,
-                    password: usuario.password
+                    email: user.email,
+                    password: user.password
                 })
-                    .then((responseLogin) => {
+                    .then((loginResponse) => {
 
-                        expect(responseLogin.status)
+                        expect(loginResponse.status)
                             .to.equal(200);
 
 
-                        expect(responseLogin.body.message)
+                        expect(loginResponse.body.message)
                             .to.equal("Login realizado com sucesso");
 
 
-                        expect(responseLogin.body.authorization)
+                        expect(loginResponse.body.authorization)
                             .to.be.a("string")
                             .and.not.empty;
 
 
-                        Cypress.env("token", responseLogin.body.authorization);
+                        Cypress.env("token", loginResponse.body.authorization);
 
                     });
 
@@ -43,29 +43,29 @@ describe("API - Login", () => {
     });
 
 
-    it("não deve realizar login com senha inválida", () => {
+    it("should not log in with an invalid password", () => {
 
-        const usuario = criarUsuario();
+        const user = getFakerUser();
 
-        criarUsuarioApi(usuario)
-            .then((responseCadastro) => {
+        createUserApi(user)
+            .then((registrationResponse) => {
 
-                expect(responseCadastro.status)
+                expect(registrationResponse.status)
                     .to.equal(201);
 
 
                 loginApi({
-                    email: usuario.email,
+                    email: user.email,
                     password: "senhaIncorreta"
                 }, {
                     failOnStatusCode: false
                 })
-                    .then((responseLogin) => {
+                    .then((loginResponse) => {
 
-                        expect(responseLogin.status)
+                        expect(loginResponse.status)
                             .to.equal(401);
 
-                        expect(responseLogin.body.message)
+                        expect(loginResponse.body.message)
                             .to.equal("Email e/ou senha inválidos");
 
                     });

@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 
-export function criarProduto() {
+export function createProduct() {
   return {
     nome: faker.commerce.productName(),
     preco: parseInt(faker.commerce.price({ min: 10, max: 1000 })),

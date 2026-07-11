@@ -1,35 +1,31 @@
-export function preencherCampo(dataTestId, valor) {
+export function fillField(dataTestId, value) {
   cy.get(`[data-testid="${dataTestId}"]`)
     .should("be.visible")
-    .should("not.be.disabled");
-  cy.get(`[data-testid="${dataTestId}"]`)
-    .type(valor);
+    .should("not.be.disabled")
+    .clear()
+    .type(value);
 }
 
-
-export function clicarBotao(dataTestId) {
+export function clickButton(dataTestId) {
   cy.get(`[data-testid="${dataTestId}"]`)
     .should("be.visible")
     .should("not.be.disabled")
     .click();
 }
 
-
-export function verificarCheckbox(dataTestId) {
+export function verifyCheckbox(dataTestId) {
   cy.get(`[data-testid="${dataTestId}"]`)
     .should("be.visible")
     .check()
     .should("be.checked");
 }
 
-
-export function verificarTexto(texto) {
-  cy.contains(texto)
+export function verifyText(text) {
+  cy.contains(text, { timeout: 10000 })
     .should("be.visible");
 }
 
-
-export function verificarUrl(url) {
+export function verifyUrl(url) {
   cy.url()
     .should("eq", url);
 }

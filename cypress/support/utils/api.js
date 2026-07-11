@@ -1,12 +1,11 @@
-export function criarUsuarioApi(usuario, options = {}) {
+export function createUserApi(user, options = {}) {
   return cy.request({
     method: "POST",
     url: `${Cypress.env("apiUrl")}/usuarios`,
-    body: usuario,
+    body: user,
     ...options
   });
 }
-
 
 export function loginApi(credentials, options = {}) {
   return cy.request({
@@ -17,12 +16,11 @@ export function loginApi(credentials, options = {}) {
   });
 }
 
-
-export function criarProdutoApi(produto, options = {}) {
+export function createProductApi(product, options = {}) {
   return cy.request({
     method: "POST",
     url: `${Cypress.env("apiUrl")}/produtos`,
-    body: produto,
+    body: product,
     headers: {
       "Authorization": Cypress.env("token")
     },
