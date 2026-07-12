@@ -1,6 +1,4 @@
 import { getFakerUser } from "../../support/utils/users";
-import { createUserApi, loginApi } from "../../support/utils/api";
-
 
 describe("API - Login", () => {
 
@@ -8,14 +6,14 @@ describe("API - Login", () => {
 
         const user = getFakerUser();
 
-        createUserApi(user)
+        cy.createUserWithAPI(user)
             .then((registrationResponse) => {
 
                 expect(registrationResponse.status)
                     .to.equal(201);
 
 
-                loginApi({
+                cy.loginWithAPI({
                     email: user.email,
                     password: user.password
                 })
@@ -47,14 +45,14 @@ describe("API - Login", () => {
 
         const user = getFakerUser();
 
-        createUserApi(user)
+        cy.createUserWithAPI(user)
             .then((registrationResponse) => {
 
                 expect(registrationResponse.status)
                     .to.equal(201);
 
 
-                loginApi({
+                cy.loginWithAPI({
                     email: user.email,
                     password: "senhaIncorreta"
                 }, {

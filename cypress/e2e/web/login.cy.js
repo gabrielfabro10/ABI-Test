@@ -1,6 +1,5 @@
-import { faker } from '@faker-js/faker';
-import { fillField, clickButton, verifyUrl, verifyText } from "../../support/utils/web";
-import { createUserApi } from "../../support/utils/api";
+import { faker } from "@faker-js/faker";
+import { verifyText } from "../../support/utils/web";
 import { getFakerUser } from "../../support/utils/users";
 
 describe("Web - Login", () => {
@@ -9,29 +8,14 @@ describe("Web - Login", () => {
 
         const user = getFakerUser();
 
-        createUserApi(user)
+        cy.createUserWithAPI(user)
             .then((response) => {
 
                 expect(response.status)
                     .to.equal(201);
 
-
-                cy.visit("/login");
-
-
-                cy.url()
-                    .should("eq", `${Cypress.config("baseUrl")}/login`);
-
-
-                fillField("email", user.email);
-
-                fillField("senha", user.password);
-
-
-                clickButton("entrar");
-
-                cy.location("pathname", { timeout: 10000 })
-                    .should("eq", "/admin/home");
+                cy.loginWithUI(user.email, user.password);
+                cy.assertHomePage();
 
             });
 
@@ -42,24 +26,13 @@ describe("Web - Login", () => {
 
         const user = getFakerUser();
 
-        createUserApi(user)
+        cy.createUserWithAPI(user)
             .then((response) => {
 
                 expect(response.status)
                     .to.equal(201);
 
-
-                cy.visit("/login");
-
-
-                fillField("email", user.email);
-
-                fillField("senha", faker.internet.password());
-
-
-                clickButton("entrar");
-
-
+                cy.loginWithUI(user.email, faker.internet.password());
                 verifyText("Email e/ou senha inválidos");
 
             });

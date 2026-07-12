@@ -1,5 +1,4 @@
 import { getFakerUser } from "../../support/utils/users";
-import { createUserApi } from "../../support/utils/api";
 
 describe("API - Users", () => {
 
@@ -7,7 +6,7 @@ describe("API - Users", () => {
 
         const user = getFakerUser();
 
-        createUserApi(user)
+        cy.createUserWithAPI(user)
             .then((response) => {
 
                 expect(response.status)
@@ -35,14 +34,14 @@ describe("API - Users", () => {
 
         const user = getFakerUser();
 
-        createUserApi(user)
+        cy.createUserWithAPI(user)
             .then((response) => {
 
                 expect(response.status)
                     .to.equal(201);
 
 
-                createUserApi(user, {
+                cy.createUserWithAPI(user, {
                     failOnStatusCode: false
                 })
                     .then((duplicateResponse) => {

@@ -1,5 +1,5 @@
-import { faker } from '@faker-js/faker';
-import { fillField, clickButton, verifyCheckbox, verifyText, verifyUrl } from "../../support/utils/web";
+import { faker } from "@faker-js/faker";
+import { verifyText, verifyUrl } from "../../support/utils/web";
 
 describe("Web - Registration", () => {
 
@@ -9,41 +9,16 @@ describe("Web - Registration", () => {
         const email = faker.internet.email();
         const password = faker.internet.password();
 
-        // Access the login page
-        cy.visit("/login");
+        cy.registerUserWithUI({
+            name: fullName,
+            email,
+            password,
+            admin: true
+        });
 
-        // Verify that the login page loaded
-        cy.url()
-            .should("eq", `${Cypress.config("baseUrl")}/login`);
-
-        // Click the sign-up button
-        clickButton("cadastrar");
-
-        // Verify redirection to the registration page
-        verifyUrl(`${Cypress.config("baseUrl")}/cadastrarusuarios`);
-
-        // Fill the name field
-        fillField("nome", fullName);
-
-        // Fill the email field
-        fillField("email", email);
-
-        // Fill the password field
-        fillField("password", password);
-
-        // Mark the administrator checkbox
-        verifyCheckbox("checkbox");
-
-        // Click the register button
-        clickButton("cadastrar");
-
-        // Verify that the success message appears
         verifyText("Cadastro realizado com sucesso");
+        cy.assertHomePage();
 
-        cy.location("pathname", { timeout: 10000 })
-            .should("eq", "/admin/home");
-
-        // Save the email and password for future use
         Cypress.env("emailWeb", email);
         Cypress.env("passwordWeb", password);
 
@@ -52,23 +27,22 @@ describe("Web - Registration", () => {
 
     it("should not allow registration with empty fields", () => {
 
-        cy.visit("/login");
-
-        clickButton("cadastrar");
+        cy.visitLoginPage();
+        cy.get('[data-testid="cadastrar"]').click();
 
         verifyUrl(`${Cypress.config("baseUrl")}/cadastrarusuarios`);
 
         cy.get('[data-testid="nome"]')
             .should("be.visible")
-            .should("have.value", "");
+            .and("have.value", "");
 
         cy.get('[data-testid="email"]')
             .should("be.visible")
-            .should("have.value", "");
+            .and("have.value", "");
 
         cy.get('[data-testid="password"]')
             .should("be.visible")
-            .should("have.value", "");
+            .and("have.value", "");
 
         cy.get('[data-testid="cadastrar"]')
             .should("be.visible");
@@ -85,42 +59,22 @@ describe("Web - Registration", () => {
         const secondName = faker.person.fullName();
         const secondPassword = faker.internet.password();
 
-        cy.visit("/login");
-
-        clickButton("cadastrar");
-
-        verifyUrl(`${Cypress.config("baseUrl")}/cadastrarusuarios`);
-
-        fillField("nome", firstName);
-
-        fillField("email", email);
-
-        fillField("password", firstPassword);
-
-        verifyCheckbox("checkbox");
-
-        clickButton("cadastrar");
+        cy.registerUserWithUI({
+            name: firstName,
+            email,
+            password: firstPassword,
+            admin: true
+        });
 
         verifyText("Cadastro realizado com sucesso");
+        cy.assertHomePage();
 
-        cy.location("pathname", { timeout: 10000 })
-            .should("eq", "/admin/home");
-
-        cy.visit("/login");
-
-        clickButton("cadastrar");
-
-        verifyUrl(`${Cypress.config("baseUrl")}/cadastrarusuarios`);
-
-        fillField("nome", secondName);
-
-        fillField("email", email);
-
-        fillField("password", secondPassword);
-
-        verifyCheckbox("checkbox");
-
-        clickButton("cadastrar");
+        cy.registerUserWithUI({
+            name: secondName,
+            email,
+            password: secondPassword,
+            admin: true
+        });
 
         verifyText("Este email já está sendo usado");
 
